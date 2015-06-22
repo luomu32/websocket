@@ -22,23 +22,31 @@
 		var ws = new WebSocket("ws://localhost:8080/websocket/chat");
 		ws.onopen = function(event) {
 
-			// 发送一个初始化消息
-			ws.send('I am the client and I\'m listening!');
-
 			// 监听消息
 			ws.onmessage = function(event) {
 				console.log('Client received a message', event);
+				document.getElementById("message-history").value += "\n"
+						+ event.data;
 			};
 
 			// 监听Socket的关闭
 			ws.onclose = function(event) {
 				console.log('Client notified socket has closed', event);
+				ws.send("good bye");
 			};
 
 			// 关闭Socket.... 
 			//ws.close() 
 		};
-
+		window.onkeydown=function(e){
+			var event=e||window.event;
+			var code=event.keyCode||event.which||event.charCode;
+			if(code==13){
+				send();
+				return false;
+			}
+			return true;
+		}
 		function send() {
 
 			if (!document.getElementById("send-message").value)
@@ -50,6 +58,8 @@
 			else
 				document.getElementById("message-history").value += "\n"
 						+ document.getElementById("send-message").value;
+
+			ws.send(document.getElementById("send-message").value);
 			document.getElementById("send-message").value = '';
 		}
 	</script>
